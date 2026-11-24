@@ -1,7 +1,7 @@
-function generateVideo() {
+async function generateVideo() {
     const prompt = document.getElementById("prompt").value.trim();
 
-    if (prompt === "") {
+    if (!prompt) {
         alert("Please enter a video description.");
         return;
     }
@@ -10,9 +10,29 @@ function generateVideo() {
     button.textContent = "Generating...";
     button.disabled = true;
 
-    setTimeout(() => {
-        alert("Your prompt is:\n\n" + prompt + "\n\nPhoenix AI is not connected to a video model yet.");
-        button.textContent = "Generate Video";
-        button.disabled = false;
-    }, 2000);
+    try {
+        const response = await fetch("https://phoenix-ai-2v0w.onrender.com/generate", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                prompt: prompt
+            })
+        });
+
+        const data = await response.json();
+
+        alert(
+            "Backend connected successfully!\n\n" +
+            "Status: " + data.status + "\n" +
+            "Prompt: " + data.prompt
+        );
+
+    } catch (error) {
+        alert("Connection failed: " + error.message);
+    }
+
+    button.textContent = "Generate Video";
+    button.disabled = false;
 }
